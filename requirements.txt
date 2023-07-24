@@ -1,0 +1,14 @@
+APScheduler==3.6.3
+backports.zoneinfo==0.2.1
+cachetools==4.2.2
+Django==3.2.19
+idna==3.4
+python-dotenv==0.21.0
+python-telegram-bot==13.14
+requests==2.28.1
+six==1.16.0
+tornado==6.1
+Pillow==9.5.0
+djangorestframework==3.14.0
+djoser==2.1.0
+django-filter==23.1
