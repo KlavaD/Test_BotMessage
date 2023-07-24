@@ -1,6 +1,6 @@
 from django.db import models
 
-from bot import wake_up, get_news, get_weather, help
+# from bot import wake_up, get_news, get_weather, help
 from botmessage import settings
 from message.validators import command_validator
 
@@ -44,7 +44,7 @@ class HistoryOfMessage(models.Model):
         max_length=settings.FIELD_TEXT_LENGTH,
         blank=False,
         null=False,
-        verbose_name='ID чата с пользователем в телеграмме'
+        verbose_name='Пользователь телеграмм'
     )
     message = models.TextField(
         verbose_name='Сообщение'
@@ -60,4 +60,5 @@ class HistoryOfMessage(models.Model):
 
     class Meta:
         verbose_name = 'История сообщений'
+        verbose_name_plural = 'История сообщений'
         ordering = ('-pub_date',)

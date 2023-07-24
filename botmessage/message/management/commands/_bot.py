@@ -1,11 +1,13 @@
 import logging
 import os
+import re
 from http import HTTPStatus
 from logging.handlers import RotatingFileHandler
 from random import randint
 
 import requests
 import telegram
+from django.shortcuts import get_object_or_404
 from dotenv import load_dotenv
 from requests import RequestException
 from telegram import ReplyKeyboardMarkup
@@ -31,6 +33,7 @@ LOGGING_CONNECTION_ERROR = (
     'Возникла ошибка при загрузке страницы {url}{error}'
 )
 ERROR_TOKEN = 'Нет токена {token}'
+PATTERN = r'/(?P<command>\w+)'
 
 
 def configure_logging():
@@ -48,14 +51,17 @@ def configure_logging():
     )
 
 
-def send_message(bot, message, chat_id, reply_markup=None):
+def send_message(bot, message, update, reply_markup=None):
     """Отправляет сообщение в Telegram чат."""
     try:
         logging.info(f'начали отправку сообщения "{message}" в Telegram')
-        bot.send_message(chat_id, message, reply_markup=reply_markup)
+        bot.send_message(
+            update.effective_chat.id,
+            message,
+            reply_markup=reply_markup)
         logging.info(f'отправлено сообщение "{message}"')
         HistoryOfMessage.objects.create(
-            user=chat_id,
+            user=update.effective_user.name,
             message=message
         )
         logging.info('Сообщение записано в БД')
@@ -84,20 +90,27 @@ def get_api_answer(url, params):
     return response
 
 
-def get_weather(update, context, command_message):
+def get_message(update):
+    return (get_object_or_404(
+        BotCommand,
+        command=re.search(PATTERN, update.message.text).group('command'),
+    ).message)
+
+
+def get_weather(update, context):
     """Функция запроса города"""
     send_message(
         context.bot,
-        '{}'+command_message.format(update.message.chat.first_name),
-        update.effective_chat.id)
+        '{}'.format(update.message.chat.first_name + ' ' + get_message(update)),
+        update)
 
 
 def get_weather_in(update, context):
     """Функция для получения погоды в определенном городе"""
-    message = update.message
+    message = update.message.text
     params = {
         'APPID': WEATHER_KEY,
-        'q': message.text,
+        'q': message,
         'units': 'metric'
     }
     try:
@@ -106,66 +119,56 @@ def get_weather_in(update, context):
             'Сейчас температура воздуха в городе {city} составляет '
             '{temp} градусов'.format(
                 temp=response.json()['main']['temp'],
-                city=message.text,
+                city=message,
             )
         )
     except UrlNotAvailable as error:
         logging.error('Возникла ошибка {error}'.format(error=error))
         text = '{error} {city}, Попробуйте ввести другой город'.format(
             error=error,
-            city=message.text
+            city=message
         )
-    send_message(context.bot, text, update.effective_chat.id)
+    send_message(context.bot, text, update)
 
 
-def get_news(update, context, command_message):
+def get_news(update, context):
     """Функция для получения
      1 рандомной новости из NEWS_COUNT последних на сайте tass.ru"""
     params = {
         'domains': 'tass.ru',
         'language': 'ru',
         'sortBy': 'publishedAt',
-        'pageSize': settings.NEWS_COUNT.NEWS_COUNT,
+        'pageSize': settings.NEWS_COUNT,
         'apiKey': NEWS_KEY,
     }
     response = get_api_answer(NEWS_URL, params)
+    command_message = get_message(update)
     text = (
-        command_message+'{}'.format(
-            response.json()['articles'][
-                randint(0, settings.NEWS_COUNT - 1)
-            ]['url']
-        )
+            command_message + '{}'.format(
+        response.json()['articles'][randint(0, settings.NEWS_COUNT - 1)]['url']
     )
-    send_message(context.bot, text, update.effective_chat.id)
+    )
+    send_message(context.bot, text, update)
 
 
-def wake_up(update, context, command_message):
+def wake_up(update, context):
     commands = BotCommand.objects.all()
     name_buttons = []
     for command in commands:
-        name_buttons.append('\\'+command.command)
+        name_buttons.append('/' + command.command)
     button = ReplyKeyboardMarkup([name_buttons],
                                  resize_keyboard=True)
     send_message(
         context.bot,
-        '{}'+command_message.format(update.message.chat.first_name),
-        update.effective_chat.id,
+        '{}'.format(update.effective_user.name) + ' ' + get_message(update),
+        update,
         reply_markup=button
     )
 
 
-def help(update, context, command_message):
+def help(update, context):
     # Отправляем пользователю информацию о том, как пользоваться ботом.
-#     help_text = """
-# Вот список команд, которые можно использовать:
-#
-# Команды:
-# /start - начать диалог со мной
-# /help - получить справку
-# /weather - Температура сейчас в городе ...
-# /news - Прочитать новость
-#     """
-    send_message(context.bot, command_message, update.effective_chat.id)
+    send_message(context.bot, get_message(update), update)
 
 
 def check_tokens():

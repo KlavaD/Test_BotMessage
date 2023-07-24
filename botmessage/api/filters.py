@@ -8,4 +8,4 @@ class HistoryMessageFilter(django_filters.FilterSet):
 
     class Meta:
         model = HistoryOfMessage
-        fields = 'user'
+        fields = ('user',)

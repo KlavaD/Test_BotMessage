@@ -6,10 +6,10 @@ from message.models import BotCommand, HistoryOfMessage
 class CommandsSerializer(serializers.ModelSerializer):
     class Meta:
         model = BotCommand
-        fields = ('command', 'function', 'message')
+        fields = ('id', 'command', 'function', 'message')
 
 
 class HistoryMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = HistoryOfMessage
-        fields = ('user', 'message')
+        fields = ('id', 'user', 'message')

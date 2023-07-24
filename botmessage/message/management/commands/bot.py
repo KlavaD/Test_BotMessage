@@ -25,6 +25,7 @@ COMMAND_TO_FUNCTION = {
     'get_weather': get_weather,
 }
 
+
 class Command(BaseCommand):
 
     def add_arguments(self, parser):
@@ -42,6 +43,7 @@ class Command(BaseCommand):
                 CommandHandler(
                     command.command,
                     COMMAND_TO_FUNCTION[command.function]
+
                 )
             )
         updater.dispatcher.add_handler(
@@ -56,4 +58,3 @@ class Command(BaseCommand):
             )
         updater.idle()
         self.stdout.write(self.style.SUCCESS('Бот остановлен'))
-
