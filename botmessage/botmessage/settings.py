@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django_filters',
     'users.apps.UsersConfig',
     'message.apps.MessageConfig',
-    'api.apps.ApiConfig'
+    'api.apps.ApiConfig',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -128,6 +129,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 DJOSER = {
     'USER_ID_FIELD': 'id',
@@ -137,6 +139,13 @@ DJOSER = {
         'user': ['rest_framework.permissions.IsAuthenticated'],
     },
     'HIDE_USERS': False,
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'TestBotMessage',
+    'DESCRIPTION': 'Бот, у которого можно узнать последние новости и погоду',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 # Internationalization
