@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from dotenv import load_dotenv
 from requests import RequestException
 from telegram import ReplyKeyboardMarkup
-
+from telegram.ext import Handler
 from botmessage import settings
 from exceptions import UrlNotAvailable
 from message.models import BotCommand, HistoryOfMessage
@@ -37,6 +37,7 @@ PATTERN = r'/(?P<command>\w+)'
 
 
 def configure_logging():
+    """Функция настройки логирования"""
     rotating_handler = RotatingFileHandler(
         settings.LOG_FILE,
         encoding='utf-8',
@@ -61,7 +62,7 @@ def send_message(bot, message, update, reply_markup=None):
             reply_markup=reply_markup)
         logging.info(f'отправлено сообщение "{message}"')
         HistoryOfMessage.objects.create(
-            user=update.effective_user.name,
+            telegram_user=update.effective_user.name,
             message=message
         )
         logging.info('Сообщение записано в БД')
@@ -91,6 +92,8 @@ def get_api_answer(url, params):
 
 
 def get_message(update):
+    """Функция для получения сообщения из БД, соответствующего команде"""
+
     return (get_object_or_404(
         BotCommand,
         command=re.search(PATTERN, update.message.text).group('command'),
@@ -99,10 +102,11 @@ def get_message(update):
 
 def get_weather(update, context):
     """Функция запроса города"""
-    send_message(
+    msg = send_message(
         context.bot,
         '{}'.format(update.message.chat.first_name + ' ' + get_message(update)),
         update)
+
 
 
 def get_weather_in(update, context):
@@ -144,14 +148,21 @@ def get_news(update, context):
     response = get_api_answer(NEWS_URL, params)
     command_message = get_message(update)
     text = (
-            command_message + '{}'.format(
-        response.json()['articles'][randint(0, settings.NEWS_COUNT - 1)]['url']
-    )
+            command_message
+            + '{}'.format(response.json()['articles']
+                          [randint(0, settings.NEWS_COUNT - 1)]
+                          ['title']
+                          + '\n' +
+                          response.json()['articles']
+                          [randint(0, settings.NEWS_COUNT - 1)]
+                          ['url']
+                          )
     )
     send_message(context.bot, text, update)
 
 
 def wake_up(update, context):
+    """Функция команды приветствия"""
     commands = BotCommand.objects.all()
     name_buttons = []
     for command in commands:
@@ -167,7 +178,7 @@ def wake_up(update, context):
 
 
 def help(update, context):
-    # Отправляем пользователю информацию о том, как пользоваться ботом.
+    """Функция команды помощи"""
     send_message(context.bot, get_message(update), update)
 
 

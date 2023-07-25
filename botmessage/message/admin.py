@@ -13,7 +13,7 @@ class BotCommandAdmin(admin.ModelAdmin):
 
 @admin.register(HistoryOfMessage)
 class HistoryOfMessageAdmin(admin.ModelAdmin):
-    list_display = ('user', 'message', 'pub_date')
-    search_fields = ('user',)
+    list_display = ('telegram_user', 'message', 'pub_date')
+    search_fields = ('telegram_user',)
     list_filter = ('pub_date',)
     empty_value_display = '-пусто-'

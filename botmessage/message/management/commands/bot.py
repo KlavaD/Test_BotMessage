@@ -2,7 +2,8 @@ import logging
 import os
 
 from django.core.management.base import BaseCommand
-from telegram.ext import CommandHandler, Updater, MessageHandler, Filters
+from telegram.ext import (CommandHandler, Updater, MessageHandler, Filters,
+                          )
 
 from message.management.commands._bot import (
     configure_logging,
@@ -18,6 +19,8 @@ from message.models import BotCommand
 LOGGING_START = 'Бот запущен запущен!'
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 LOGGING_ERROR = 'Сбой в работе программы {error}'
+# константа для сопоставления ф-ций обработчиков
+# и команд(из модели поле function)
 COMMAND_TO_FUNCTION = {
     'wake_up': wake_up,
     'help': help,
@@ -43,7 +46,6 @@ class Command(BaseCommand):
                 CommandHandler(
                     command.command,
                     COMMAND_TO_FUNCTION[command.function]
-
                 )
             )
         updater.dispatcher.add_handler(

@@ -40,7 +40,7 @@ class BotCommand(models.Model):
 
 
 class HistoryOfMessage(models.Model):
-    user = models.CharField(
+    telegram_user = models.CharField(
         max_length=settings.FIELD_TEXT_LENGTH,
         blank=False,
         null=False,

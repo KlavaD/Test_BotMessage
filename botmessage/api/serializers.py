@@ -12,4 +12,4 @@ class CommandsSerializer(serializers.ModelSerializer):
 class HistoryMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = HistoryOfMessage
-        fields = ('id', 'user', 'message')
+        fields = ('id', 'telegram_user', 'message')
