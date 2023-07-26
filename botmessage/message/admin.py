@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from message.models import BotCommand, HistoryOfMessage
 
@@ -13,7 +14,15 @@ class BotCommandAdmin(admin.ModelAdmin):
 
 @admin.register(HistoryOfMessage)
 class HistoryOfMessageAdmin(admin.ModelAdmin):
-    list_display = ('telegram_user', 'message', 'pub_date')
+    @admin.display(description='Картинка')
+    def take_image(self, obj):
+        if obj.image:
+            return mark_safe(
+                f'<img src={obj.image.url} width="80" height="60">'
+            )
+        return None
+
+    list_display = ('telegram_user', 'message', 'take_image', 'pub_date',)
     search_fields = ('telegram_user',)
     list_filter = ('pub_date',)
     empty_value_display = '-пусто-'

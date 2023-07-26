@@ -13,7 +13,7 @@ COMMAND_TO_FUNCTION = (
 
 
 class BotCommand(models.Model):
-    command = models.TextField(
+    command = models.CharField(
         help_text='Команда может быть только латинскими буквами',
         max_length=settings.FIELD_TEXT_LENGTH,
         verbose_name='Команда бота',
@@ -49,7 +49,11 @@ class HistoryOfMessage(models.Model):
     message = models.TextField(
         verbose_name='Сообщение'
     )
-
+    image = models.ImageField(
+        verbose_name='Фото',
+        upload_to='message/images/',
+        blank=True,
+    )
     pub_date = models.DateTimeField(
         verbose_name='Дата отправления',
         auto_now_add=True

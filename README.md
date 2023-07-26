@@ -33,7 +33,51 @@ Python3.7+,
 ```
 git clone https://github.com/KlavaD/Test_BotMessage
 ```
-Создать и активировать виртуальное окружение:
+
+### Вариант 1 (с Docker)
+
+* Перейти в папку infra
+
+* Создать файл .env
+
+DB_ENGINE=django.db.backends.postgresql\
+DB_NAME=postgres\
+POSTGRES_USER=postgres\
+POSTGRES_PASSWORD=postgres\
+DB_HOST=db\
+DB_PORT=5432\
+BOT_TOKEN - Токен вашего бота\
+WEATHER_KEY - Токен для получения погоды с сайта\
+[openweathermap](https://openweathermap.org/api)\
+NEWS_KEY - Токен для получения новостей\
+[newsapi](https://newsapi.org/)\
+
+* Запустить docker-compose
+
+```
+docker-compose up -d --build
+```
+* Выполнить команды:
+
+```
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py collectstatic --no-input
+```
+* Загрузить первичные данные
+
+```
+docker-compose exec web python manage.py adddata
+```
+* Запустить Бота:
+
+```
+docker-compose exec web python manage.py bot
+```
+
+### Вариант 2
+
+* Создать и активировать виртуальное окружение:
 
 ```
 python3 -m venv env
@@ -41,56 +85,62 @@ python3 -m venv env
 
 * Если у вас Linux/macOS
 
-    ```
-    source env/bin/activate
-    ```
+```
+source env/bin/activate
+```
 
 * Если у вас windows
 
-    ```
-    source env/scripts/activate
-    ```
+```
+venv\Scripts\activate
+```
 
-Обновить pip:
+* Обновить pip:
 
 ```
 python3 -m pip install --upgrade pip
 ```
 
-Установить зависимости из файла requirements.txt:
+* Установить зависимости из файла requirements.txt:
 
 ```
 pip install -r requirements.txt
 ```
 
-Создать в папке botmessage файл .env с переменными окружения:
+* Создать в папке botmessage файл .env с переменными окружения:
 
-*BOT_TOKEN* - Токен вашего бота
+BOT_TOKEN - Токен вашего бота\
+WEATHER_KEY - Токен для получения погоды с сайта\
+[openweathermap](https://openweathermap.org/api)\
+NEWS_KEY - Токен для получения новостей\
+[newsapi](https://newsapi.org/)\
 
-*WEATHER_KEY* - Токен для получения погоды с сайта
-[openweathermap](https://openweathermap.org/api)
-
-*NEWS_KEY* - Токен для получения новостей
-[newsapi](https://newsapi.org/)
-
-Выполнить миграции:
+* Выполнить миграции:
 
 ```
 python3 manage.py migrate
 ```
 
-Запустить проект:
+* Запустить проект:
 
 ```
 python3 manage.py runserver
 ```
-Запустить Бота:
+* Заполнить начальные данные:
+
+```
+python manage.py adddata
+```
+* Запустить Бота:
 
 ```
 python manage.py bot
 ```
 
 ## Примеры запросов: ##
+
+*Через docker эндпоинты без* :8000
+
 Посмотреть документацию:
 >**GET** http://127.0.0.1:8000/api/schema/redoc/
 
