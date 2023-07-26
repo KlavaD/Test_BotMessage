@@ -21,7 +21,6 @@ class BotCommand(models.Model):
         validators=[command_validator]
     )
     function = models.TextField(
-        max_length=settings.FIELD_TEXT_LENGTH,
         verbose_name='Описание действий бота',
         choices=COMMAND_TO_FUNCTION,
         unique=True

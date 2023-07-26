@@ -24,5 +24,5 @@ class HistoryMessageViewSet(viewsets.ModelViewSet):
                        filters.SearchFilter,
                        filters.OrderingFilter)
     filterset_class = HistoryMessageFilter
-    ordering_fields = ['-pub_date']
+    ordering_fields = ('-pub_date', )
     serializer_class = HistoryMessageSerializer

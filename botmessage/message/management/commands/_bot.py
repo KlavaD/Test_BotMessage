@@ -11,9 +11,10 @@ from django.shortcuts import get_object_or_404
 from dotenv import load_dotenv
 from requests import RequestException
 from telegram import ReplyKeyboardMarkup
-from telegram.ext import Handler
+
 from botmessage import settings
-from exceptions import UrlNotAvailable
+from message.exceptions import UrlNotAvailable
+
 from message.models import BotCommand, HistoryOfMessage
 
 load_dotenv()
@@ -102,11 +103,10 @@ def get_message(update):
 
 def get_weather(update, context):
     """Функция запроса города"""
-    msg = send_message(
+    send_message(
         context.bot,
         '{}'.format(update.message.chat.first_name + ' ' + get_message(update)),
         update)
-
 
 
 def get_weather_in(update, context):
@@ -148,15 +148,13 @@ def get_news(update, context):
     response = get_api_answer(NEWS_URL, params)
     command_message = get_message(update)
     text = (
-            command_message
-            + '{}'.format(response.json()['articles']
-                          [randint(0, settings.NEWS_COUNT - 1)]
-                          ['title']
-                          + '\n' +
-                          response.json()['articles']
-                          [randint(0, settings.NEWS_COUNT - 1)]
-                          ['url']
-                          )
+            command_message + '{}'.format(
+        response.json()['articles']
+        [randint(0, settings.NEWS_COUNT - 1)]
+        ['title'] + '\n' +
+        response.json()['articles'][randint(0, settings.NEWS_COUNT - 1)]
+        ['url']
+    )
     )
     send_message(context.bot, text, update)
 
