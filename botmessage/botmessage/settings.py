@@ -1,7 +1,5 @@
-
 import os
 from pathlib import Path
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -132,6 +130,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Бот, у которого можно узнать последние новости и погоду',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'DISABLE_ERRORS_AND_WARNINGS': True
 }
 
 # Internationalization
