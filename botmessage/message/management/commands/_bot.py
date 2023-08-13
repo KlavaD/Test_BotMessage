@@ -147,10 +147,13 @@ def get_news(update, context):
     }
     response = get_api_answer(NEWS_URL, params)
     command_message = get_message(update)
+    news_message = response.json()['articles'][
+        randint(0, settings.NEWS_COUNT - 1)
+    ]
     text = (
-            command_message + '{}'.format(
-        response.json()['articles'][randint(0, settings.NEWS_COUNT - 1)]['url']
-    )
+            command_message +
+            '{}'.format(news_message['title']) + '\n' +
+            '{}'.format(news_message['url'])
     )
     send_message(context.bot, text, update)
 
